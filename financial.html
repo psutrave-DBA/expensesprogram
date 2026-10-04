@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <title>
+        Financial Analysis
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            font-family:
+                'Segoe UI',
+                Arial,
+                sans-serif;
+
+            margin: 0;
+
+            padding: 25px;
+
+            background: #f4f6f9;
+
+            color: #333;
+        }
+
+
+        /* =====================================================
+           HEADER
+           ====================================================== */
+
+        .header {
+
+            max-width: 1500px;
+
+            margin:
+                0 auto 20px auto;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .header h2 {
+
+            margin: 0;
+
+            color: #333;
+        }
+
+
+        .nav-buttons {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .nav-btn {
+
+            color: white;
+
+            padding: 10px 16px;
+
+            border-radius: 5px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+            font-size: 13px;
+        }
+
+
+        .home-btn {
+            background: #28a745;
+        }
+
+
+        .analytics-btn {
+            background: #528B8B;
+        }
+
+
+        /* =====================================================
+           FILTERS
+           ====================================================== */
+
+        .filter-card {
+
+            max-width: 1500px;
+
+            margin:
+                0 auto 20px auto;
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 4px 8px
+                rgba(0,0,0,.04);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .filter-label {
+
+            font-weight: bold;
+
+            color: #555;
+        }
+
+
+        select {
+
+            padding: 10px 12px;
+
+            min-width: 150px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 5px;
+
+            background: white;
+
+            font-family: inherit;
+
+            font-size: 14px;
+        }
+
+
+        select:focus {
+
+            outline: none;
+
+            border-color:
+                #6f42c1;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(111,66,193,.12);
+        }
+
+
+        /* =====================================================
+           DOWNLOAD BUTTON
+           ====================================================== */
+
+        .download-btn {
+
+            padding:
+                10px 18px;
+
+            background: #6f42c1;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 5px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+
+        .download-btn:hover {
+
+            background: #59339d;
+        }
+
+
+        .download-btn:disabled {
+
+            background: #aaa;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =====================================================
+           SUMMARY
+           ====================================================== */
+
+        .summary-grid {
+
+            max-width: 1500px;
+
+            margin:
+                0 auto 20px auto;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+        }
+
+
+        .summary-card {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 4px 8px
+                rgba(0,0,0,.04);
+
+            text-align: center;
+        }
+
+
+        .summary-title {
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .summary-value {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            color: #528B8B;
+        }
+
+
+        .summary-value.usd {
+
+            color: #6f42c1;
+        }
+
+
+        /* =====================================================
+           TABLE
+           ====================================================== */
+
+        .table-card {
+
+            max-width: 1500px;
+
+            margin: auto;
+
+            background: white;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 4px 8px
+                rgba(0,0,0,.04);
+
+            overflow: hidden;
+        }
+
+
+        .table-header {
+
+            padding: 18px 20px;
+
+            border-bottom:
+                1px solid #eee;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .table-header h3 {
+
+            margin: 0;
+
+            color: #555;
+        }
+
+
+        .record-count {
+
+            color: #888;
+
+            font-size: 13px;
+        }
+
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+            max-height: 650px;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 900px;
+        }
+
+
+        th {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+
+            background: #528B8B;
+
+            color: white;
+
+            padding: 12px 10px;
+
+            text-align: left;
+
+            font-size: 13px;
+        }
+
+
+        td {
+
+            padding: 10px;
+
+            border-bottom:
+                1px solid #eee;
+
+            font-size: 13px;
+
+            vertical-align: top;
+        }
+
+
+        tbody tr:hover {
+
+            background: #f7fafb;
+        }
+
+
+        .amount {
+
+            text-align: right;
+
+            font-weight: 600;
+        }
+
+
+        .currency {
+
+            font-weight: bold;
+        }
+
+
+        .sar {
+            color: #528B8B;
+        }
+
+
+        .usd {
+            color: #6f42c1;
+        }
+
+
+        /* =====================================================
+           FOOTER TOTALS
+           ====================================================== */
+
+        .totals {
+
+            background: #f4f6f9;
+
+            padding: 15px 20px;
+
+            display: flex;
+
+            justify-content:
+                flex-end;
+
+            gap: 30px;
+
+            flex-wrap: wrap;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           NO DATA
+           ====================================================== */
+
+        .no-data {
+
+            padding: 60px 20px;
+
+            text-align: center;
+
+            color: #999;
+
+            font-style: italic;
+
+            display: none;
+        }
+
+
+        /* =====================================================
+           ERROR
+           ====================================================== */
+
+        .error {
+
+            max-width: 800px;
+
+            margin:
+                0 auto 20px auto;
+
+            padding: 15px;
+
+            background: #fef3f2;
+
+            color: #b42318;
+
+            border:
+                1px solid #fecdca;
+
+            border-radius: 5px;
+
+            display: none;
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ====================================================== */
+
+        @media(max-width:850px) {
+
+            .summary-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .filter-card {
+
+                align-items: stretch;
+
+                flex-direction: column;
+            }
+
+
+            select,
+            .download-btn {
+
+                width: 100%;
+            }
+
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .nav-btn {
+
+                flex: 1;
+
+                text-align: center;
+            }
+
+        }
+
+
+        /* =====================================================
+           PRINT
+           ====================================================== */
+
+        @media print {
+
+            body {
+
+                background: white;
+
+                padding: 0;
+            }
+
+
+            .nav-buttons,
+            .filter-card,
+            .download-btn {
+
+                display: none !important;
+            }
+
+
+            .summary-grid {
+
+                margin-bottom: 10px;
+            }
+
+
+            .table-wrapper {
+
+                max-height: none;
+
+                overflow: visible;
+            }
+
+
+            .table-card {
+
+                box-shadow: none;
+            }
+
+
+            th {
+
+                position: static;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER
+         ====================================================== -->
+
+    <div class="header">
+
+        <h2>
+            📋 Financial Analysis
+        </h2>
+
+
+        <div class="nav-buttons">
+
+            <a
+                href="/"
+                class="nav-btn home-btn">
+
+                ➕ Add Expense
+
+            </a>
+
+
+            <a
+                href="/report"
+                class="nav-btn analytics-btn">
+
+                📊 Analytics Report
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ERROR
+         ====================================================== -->
+
+    <div
+        id="errorMessage"
+        class="error">
+    </div>
+
+
+    <!-- =====================================================
+         FILTER
+         ====================================================== -->
+
+    <div class="filter-card">
+
+        <span class="filter-label">
+            Year:
+        </span>
+
+
+        <select
+            id="yearSelector">
+
+            <option>
+                Loading...
+            </option>
+
+        </select>
+
+
+        <span class="filter-label">
+            Month:
+        </span>
+
+
+        <select
+            id="monthSelector">
+
+            <option value="1">
+                January
+            </option>
+
+            <option value="2">
+                February
+            </option>
+
+            <option value="3">
+                March
+            </option>
+
+            <option value="4">
+                April
+            </option>
+
+            <option value="5">
+                May
+            </option>
+
+            <option value="6">
+                June
+            </option>
+
+            <option value="7">
+                July
+            </option>
+
+            <option value="8">
+                August
+            </option>
+
+            <option value="9">
+                September
+            </option>
+
+            <option value="10">
+                October
+            </option>
+
+            <option value="11">
+                November
+            </option>
+
+            <option value="12">
+                December
+            </option>
+
+        </select>
+
+
+        <button
+            id="downloadButton"
+            class="download-btn">
+
+            ⬇ Download CSV
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+         ====================================================== -->
+
+    <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Selected Period
+            </div>
+
+            <div
+                id="periodText"
+                class="summary-value">
+
+                Loading...
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Total SAR
+            </div>
+
+            <div
+                id="totalSar"
+                class="summary-value">
+
+                0.00
+
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Total INR
+            </div>
+
+            <div
+                id="totalUsd"
+                class="summary-value usd">
+
+                0.00
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABLE
+         ====================================================== -->
+
+    <div class="table-card">
+
+
+        <div class="table-header">
+
+            <h3>
+                Expense Details
+            </h3>
+
+
+            <div
+                id="recordCount"
+                class="record-count">
+
+                0 records
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Expense Date
+                        </th>
+
+                        <th>
+                            Category
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Amount
+                        </th>
+
+                        <th>
+                            Currency
+                        </th>
+
+                        <th>
+                            Payment Method
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="expenseTableBody">
+                </tbody>
+
+            </table>
+
+
+            <div
+                id="noData"
+                class="no-data">
+
+                No expenses were found
+                for the selected month.
+
+            </div>
+
+        </div>
+
+
+        <div class="totals">
+
+            <span>
+                SAR:
+                <strong id="footerSar">
+                    0.00
+                </strong>
+            </span>
+
+
+            <span>
+                INR:
+                <strong id="footerUsd">
+                    0.00
+                </strong>
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        // ======================================================
+        // ELEMENTS
+        // ======================================================
+
+        const yearSelector =
+            document.getElementById(
+                'yearSelector'
+            );
+
+        const monthSelector =
+            document.getElementById(
+                'monthSelector'
+            );
+
+        const downloadButton =
+            document.getElementById(
+                'downloadButton'
+            );
+
+
+        // ======================================================
+        // NUMBER FORMAT
+        // ======================================================
+
+        function formatNumber(value) {
+
+            return Number(
+                value || 0
+            ).toLocaleString(
+                'en-US',
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+        }
+
+
+        // ======================================================
+        // ERROR
+        // ======================================================
+
+        function showError(message) {
+
+            const element =
+                document.getElementById(
+                    'errorMessage'
+                );
+
+            element.textContent =
+                message;
+
+            element.style.display =
+                'block';
+
+        }
+
+
+        function hideError() {
+
+            document.getElementById(
+                'errorMessage'
+            ).style.display =
+                'none';
+
+        }
+
+
+        // ======================================================
+        // LOAD YEARS
+        // ======================================================
+
+        async function loadYears() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/api/financial-years',
+                        {
+                            cache: 'no-store'
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        'Unable to load years.'
+                    );
+
+                }
+
+
+                yearSelector.innerHTML =
+                    '';
+
+
+                data.years.forEach(
+                    year => {
+
+                        const option =
+                            document.createElement(
+                                'option'
+                            );
+
+                        option.value =
+                            year;
+
+                        option.textContent =
+                            year;
+
+                        yearSelector.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                // ------------------------------------------------
+                // Current year if available
+                // ------------------------------------------------
+
+                const currentYear =
+                    new Date().getFullYear();
+
+
+                if (
+                    data.years.includes(
+                        currentYear
+                    )
+                ) {
+
+                    yearSelector.value =
+                        currentYear;
+
+                }
+                else if (
+                    data.years.length > 0
+                ) {
+
+                    yearSelector.value =
+                        data.years[0];
+
+                }
+
+
+                // ------------------------------------------------
+                // Current month
+                // ------------------------------------------------
+
+                monthSelector.value =
+                    new Date()
+                        .getMonth() + 1;
+
+
+                await loadFinancialData();
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                showError(
+                    'Unable to load available years.'
+                );
+
+            }
+
+        }
+
+
+        // ======================================================
+        // LOAD FINANCIAL DATA
+        // ======================================================
+
+        async function loadFinancialData() {
+
+            try {
+
+                hideError();
+
+
+                const year =
+                    yearSelector.value;
+
+                const month =
+                    monthSelector.value;
+
+
+                if (!year || !month) {
+                    return;
+                }
+
+
+                downloadButton.disabled =
+                    true;
+
+
+                const url =
+                    '/api/financial?year=' +
+                    encodeURIComponent(year) +
+                    '&month=' +
+                    encodeURIComponent(month);
+
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            cache: 'no-store'
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        'Unable to load financial data.'
+                    );
+
+                }
+
+
+                // =================================================
+                // SUMMARY
+                // =================================================
+
+                document.getElementById(
+                    'periodText'
+                ).textContent =
+                    data.monthLabel;
+
+
+                document.getElementById(
+                    'totalSar'
+                ).textContent =
+                    formatNumber(
+                        data.totalSar
+                    );
+
+
+                document.getElementById(
+                    'totalINR'
+                ).textContent =
+                    formatNumber(
+                        data.totalUsd
+                    );
+
+
+                document.getElementById(
+                    'footerSar'
+                ).textContent =
+                    formatNumber(
+                        data.totalSar
+                    );
+
+
+                document.getElementById(
+                    'footerUsd'
+                ).textContent =
+                    formatNumber(
+                        data.totalUsd
+                    );
+
+
+                document.getElementById(
+                    'recordCount'
+                ).textContent =
+                    data.recordCount +
+                    (
+                        data.recordCount === 1
+                            ? ' record'
+                            : ' records'
+                    );
+
+
+                // =================================================
+                // TABLE
+                // =================================================
+
+                const tbody =
+                    document.getElementById(
+                        'expenseTableBody'
+                    );
+
+
+                tbody.innerHTML =
+                    '';
+
+
+                const noData =
+                    document.getElementById(
+                        'noData'
+                    );
+
+
+                if (
+                    !data.records ||
+                    data.records.length === 0
+                ) {
+
+                    noData.style.display =
+                        'block';
+
+                }
+                else {
+
+                    noData.style.display =
+                        'none';
+
+
+                    data.records.forEach(
+                        record => {
+
+                            const tr =
+                                document.createElement(
+                                    'tr'
+                                );
+
+
+                            // -------------------------------------
+                            // Date
+                            // -------------------------------------
+
+                            const dateTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            dateTd.textContent =
+                                record.expenseDate;
+
+                            tr.appendChild(
+                                dateTd
+                            );
+
+
+                            // -------------------------------------
+                            // Category
+                            // -------------------------------------
+
+                            const categoryTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            categoryTd.textContent =
+                                record.category;
+
+                            tr.appendChild(
+                                categoryTd
+                            );
+
+
+                            // -------------------------------------
+                            // Description
+                            // -------------------------------------
+
+                            const descriptionTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            descriptionTd.textContent =
+                                record.description ||
+                                '-';
+
+                            tr.appendChild(
+                                descriptionTd
+                            );
+
+
+                            // -------------------------------------
+                            // Amount
+                            // -------------------------------------
+
+                            const amountTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            amountTd.className =
+                                'amount';
+
+                            amountTd.textContent =
+                                formatNumber(
+                                    record.amount
+                                );
+
+                            tr.appendChild(
+                                amountTd
+                            );
+
+
+                            // -------------------------------------
+                            // Currency
+                            // -------------------------------------
+
+                            const currencyTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            currencyTd.className =
+                                'currency ' +
+                                (
+                                    record.currency ===
+                                    'INR'
+                                        ? 'INR'
+                                        : 'sar'
+                                );
+
+                            currencyTd.textContent =
+                                record.currency;
+
+                            tr.appendChild(
+                                currencyTd
+                            );
+
+
+                            // -------------------------------------
+                            // Payment
+                            // -------------------------------------
+
+                            const paymentTd =
+                                document.createElement(
+                                    'td'
+                                );
+
+                            paymentTd.textContent =
+                                record.paymentMethod;
+
+                            tr.appendChild(
+                                paymentTd
+                            );
+
+
+                            tbody.appendChild(
+                                tr
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                downloadButton.disabled =
+                    false;
+
+            }
+            catch (error) {
+
+                console.error(
+                    'Financial report error:',
+                    error
+                );
+
+                showError(
+                    'Unable to load financial data.'
+                );
+
+                downloadButton.disabled =
+                    false;
+
+            }
+
+        }
+
+
+        // ======================================================
+        // DOWNLOAD CSV
+        // ======================================================
+
+        function downloadCsv() {
+
+            const year =
+                yearSelector.value;
+
+            const month =
+                monthSelector.value;
+
+
+            if (!year || !month) {
+                return;
+            }
+
+
+            const url =
+                '/api/financial/download?year=' +
+                encodeURIComponent(year) +
+                '&month=' +
+                encodeURIComponent(month);
+
+
+            // Browser downloads the generated CSV.
+            window.location.href =
+                url;
+
+        }
+
+
+        // ======================================================
+        // EVENTS
+        // ======================================================
+
+        yearSelector.addEventListener(
+            'change',
+            loadFinancialData
+        );
+
+
+        monthSelector.addEventListener(
+            'change',
+            loadFinancialData
+        );
+
+
+        downloadButton.addEventListener(
+            'click',
+            downloadCsv
+        );
+
+
+        // ======================================================
+        // START
+        // ======================================================
+
+        loadYears();
+
+    </script>
+
+</body>
+
+</html>

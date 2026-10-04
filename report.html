@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <title>
+        Expense Tracker - Analytics Report
+    </title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family:
+                'Segoe UI',
+                Arial,
+                sans-serif;
+
+            margin: 0;
+
+            padding: 25px;
+
+            background: #f4f6f9;
+
+            color: #333;
+        }
+
+        .header-container {
+
+            max-width: 1400px;
+
+            margin:
+                0 auto 20px auto;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+        .header-container h2 {
+            margin: 0;
+        }
+
+        .nav-buttons {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+
+            color: white;
+
+            padding: 10px 16px;
+
+            border-radius: 5px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+            font-size: 13px;
+        }
+
+        .add-btn {
+            background: #28a745;
+        }
+
+        .financial-btn {
+            background: #6f42c1;
+        }
+
+        .filter-card {
+
+            max-width: 1400px;
+
+            margin:
+                0 auto 25px auto;
+
+            background: white;
+
+            padding: 18px 20px;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 4px 8px
+                rgba(0,0,0,.04);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        #monthSelector {
+
+            min-width: 230px;
+
+            padding: 10px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 5px;
+
+            background: white;
+
+            font-size: 14px;
+        }
+
+        .selected-period {
+
+            color: #777;
+
+            font-size: 13px;
+        }
+
+        .report-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 25px;
+
+            max-width: 1400px;
+
+            margin: auto;
+        }
+
+        .card {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 9px;
+
+            box-shadow:
+                0 4px 8px
+                rgba(0,0,0,.04);
+
+            min-height: 300px;
+
+            position: relative;
+        }
+
+        h3 {
+
+            margin-top: 0;
+
+            color: #555;
+
+            border-bottom:
+                1px solid #eee;
+
+            padding-bottom: 8px;
+
+            text-align: center;
+        }
+
+        .chart-container {
+
+            position: relative;
+
+            height: 240px;
+        }
+
+        .gauge-container {
+
+            position: relative;
+
+            height: 210px;
+
+            text-align: center;
+        }
+
+        .gauge-value {
+
+            position: absolute;
+
+            top: 95px;
+
+            left: 0;
+
+            right: 0;
+
+            font-size: 24px;
+
+            font-weight: bold;
+        }
+
+        .gauge-subtitle {
+
+            position: absolute;
+
+            top: 132px;
+
+            left: 0;
+
+            right: 0;
+
+            color: #888;
+
+            font-size: 12px;
+        }
+
+        .currency-summary {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+        .currency-box {
+
+            padding: 7px 12px;
+
+            background: #f4f6f9;
+
+            border-radius: 5px;
+
+            font-size: 13px;
+        }
+
+        .currency-box strong {
+            color: #528B8B;
+        }
+
+        .no-data-overlay {
+
+            position: absolute;
+
+            top: 55%;
+
+            left: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            color: #999;
+
+            font-style: italic;
+
+            text-align: center;
+        }
+
+        .error-message {
+
+            max-width: 700px;
+
+            margin:
+                20px auto;
+
+            padding: 15px;
+
+            background: #fef3f2;
+
+            color: #b42318;
+
+            border-radius: 5px;
+
+            display: none;
+        }
+
+        @media(max-width:850px) {
+
+            .report-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .nav-buttons {
+                width: 100%;
+            }
+
+            .toggle-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            .filter-card {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            #monthSelector {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER
+         ====================================================== -->
+
+    <div class="header-container">
+
+        <h2>
+            Financial Overview
+        </h2>
+
+        <div class="nav-buttons">
+
+            <a
+                href="/"
+                class="toggle-btn add-btn">
+
+                ➕ Add Expense
+
+            </a>
+
+            <a
+                href="/financial"
+                class="toggle-btn financial-btn">
+
+                📋 Financial Analysis
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTH SELECTOR
+         ====================================================== -->
+
+    <div class="filter-card">
+
+        <span class="filter-label">
+            📅 Report Month:
+        </span>
+
+        <select
+            id="monthSelector">
+
+            <option>
+                Loading...
+            </option>
+
+        </select>
+
+        <span
+            id="selectedPeriod"
+            class="selected-period">
+
+            Loading...
+
+        </span>
+
+    </div>
+
+
+    <div
+        id="errorMessage"
+        class="error-message">
+    </div>
+
+
+    <!-- =====================================================
+         REPORT CARDS
+         ====================================================== -->
+
+    <div class="report-grid">
+
+
+        <!-- TREND -->
+
+        <div class="card">
+
+            <h3 id="trendTitle">
+                6-Month Expense Trend
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="trendChart">
+                </canvas>
+
+                <div
+                    id="trendNoData"
+                    class="no-data-overlay"
+                    style="display:none">
+
+                    No records found.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="card">
+
+            <h3 id="totalTitle">
+                Selected Month Total
+            </h3>
+
+            <div class="gauge-container">
+
+                <canvas id="gaugeChart">
+                </canvas>
+
+                <div
+                    id="gaugeText"
+                    class="gauge-value">
+
+                    0.00 SAR
+
+                </div>
+
+                <div class="gauge-subtitle">
+                    Selected month
+                </div>
+
+            </div>
+
+            <div class="currency-summary">
+
+                <div class="currency-box">
+
+                    SAR:
+                    <strong id="sarTotal">
+                        0.00
+                    </strong>
+
+                </div>
+
+                <div class="currency-box">
+
+                    USD:
+                    <strong id="usdTotal">
+                        0.00
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CATEGORY -->
+
+        <div class="card">
+
+            <h3 id="categoryTitle">
+                Expenses by Category
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="categoryChart">
+                </canvas>
+
+                <div
+                    id="categoryNoData"
+                    class="no-data-overlay"
+                    style="display:none">
+
+                    No records found.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT -->
+
+        <div class="card">
+
+            <h3 id="paymentTitle">
+                Expenses by Payment Method
+            </h3>
+
+            <div class="chart-container">
+
+                <canvas id="paymentChart">
+                </canvas>
+
+                <div
+                    id="paymentNoData"
+                    class="no-data-overlay"
+                    style="display:none">
+
+                    No records found.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const primaryColor = '#528B8B';
+        const secondaryColor = '#86B7B7';
+        const lightColor = '#e5e9f0';
+
+        let trendChart = null;
+        let gaugeChart = null;
+        let categoryChart = null;
+        let paymentChart = null;
+
+
+        function formatNumber(value) {
+
+            return Number(
+                value || 0
+            ).toLocaleString(
+                'en-US',
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+        }
+
+
+        function destroyCharts() {
+
+            if (trendChart) {
+                trendChart.destroy();
+                trendChart = null;
+            }
+
+            if (gaugeChart) {
+                gaugeChart.destroy();
+                gaugeChart = null;
+            }
+
+            if (categoryChart) {
+                categoryChart.destroy();
+                categoryChart = null;
+            }
+
+            if (paymentChart) {
+                paymentChart.destroy();
+                paymentChart = null;
+            }
+
+        }
+
+
+        function showError(message) {
+
+            const box =
+                document.getElementById(
+                    'errorMessage'
+                );
+
+            box.textContent = message;
+
+            box.style.display = 'block';
+
+        }
+
+
+        function hideError() {
+
+            document.getElementById(
+                'errorMessage'
+            ).style.display = 'none';
+
+        }
+
+
+        async function loadMonths() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        '/api/report-months',
+                        {
+                            cache: 'no-store'
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok ||
+                    !data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        'Unable to load months.'
+                    );
+
+                }
+
+
+                const selector =
+                    document.getElementById(
+                        'monthSelector'
+                    );
+
+                selector.innerHTML = '';
+
+
+                data.months.forEach(
+                    month => {
+
+                        const option =
+                            document.createElement(
+                                'option'
+                            );
+
+                        option.value =
+                            month.value;
+
+                        option.textContent =
+                            month.label;
+
+                        selector.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                if (data.months.length > 0) {
+
+                    selector.value =
+                        data.months[0].value;
+
+                    await loadAnalytics(
+                        selector.value
+                    );
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                showError(
+                    'Unable to load report months.'
+                );
+
+            }
+
+        }
+
+
+        async function loadAnalytics(
+            selectedMonth
+        ) {
+
+            if (!selectedMonth) {
+                return;
+            }
+
+            try {
+
+                hideError();
+
+                destroyCharts();
+
+
+                const response =
+                    await fetch(
+                        '/api/analytics?month=' +
+                        encodeURIComponent(
+                            selectedMonth
+                        ),
+                        {
+                            cache: 'no-store'
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok ||
+                    !data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        'Unable to load analytics.'
+                    );
+
+                }
+
+
+                const monthLabel =
+                    data.selectedMonthLabel;
+
+
+                document.getElementById(
+                    'selectedPeriod'
+                ).textContent =
+                    'Showing: ' +
+                    monthLabel;
+
+
+                document.getElementById(
+                    'totalTitle'
+                ).textContent =
+                    monthLabel +
+                    ' Total';
+
+
+                document.getElementById(
+                    'trendTitle'
+                ).textContent =
+                    '6-Month Trend Ending ' +
+                    monthLabel;
+
+
+                document.getElementById(
+                    'categoryTitle'
+                ).textContent =
+                    'Expenses by Category — ' +
+                    monthLabel;
+
+
+                document.getElementById(
+                    'paymentTitle'
+                ).textContent =
+                    'Expenses by Payment Method — ' +
+                    monthLabel;
+
+
+                const sar =
+                    Number(
+                        data.selectedMonthTotalSar ||
+                        0
+                    );
+
+                const usd =
+                    Number(
+                        data.selectedMonthTotalUsd ||
+                        0
+                    );
+
+
+                document.getElementById(
+                    'sarTotal'
+                ).textContent =
+                    formatNumber(sar);
+
+
+                document.getElementById(
+                    'usdTotal'
+                ).textContent =
+                    formatNumber(usd);
+
+
+                document.getElementById(
+                    'gaugeText'
+                ).textContent =
+                    formatNumber(sar) +
+                    ' SAR';
+
+
+                // =================================================
+                // TREND
+                // =================================================
+
+                const labels =
+                    data.monthlyLabels || [];
+
+                if (labels.length > 0) {
+
+                    trendChart =
+                        new Chart(
+                            document.getElementById(
+                                'trendChart'
+                            ),
+                            {
+                                type: 'bar',
+
+                                data: {
+
+                                    labels,
+
+                                    datasets: [
+
+                                        {
+                                            label: 'SAR',
+
+                                            data:
+                                                data.monthlyDataSar,
+
+                                            backgroundColor:
+                                                primaryColor,
+
+                                            borderRadius: 4
+                                        },
+
+                                        {
+                                            label: 'USD',
+
+                                            data:
+                                                data.monthlyDataUsd,
+
+                                            backgroundColor:
+                                                secondaryColor,
+
+                                            borderRadius: 4
+                                        }
+
+                                    ]
+
+                                },
+
+                                options: {
+
+                                    responsive: true,
+
+                                    maintainAspectRatio:
+                                        false,
+
+                                    plugins: {
+
+                                        legend: {
+                                            display: true
+                                        }
+
+                                    },
+
+                                    scales: {
+
+                                        y: {
+                                            beginAtZero: true
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+                        );
+
+                }
+                else {
+
+                    document.getElementById(
+                        'trendNoData'
+                    ).style.display = 'block';
+
+                }
+
+
+                // =================================================
+                // GAUGE
+                // =================================================
+
+                const maximum =
+                    Math.max(
+                        sar * 1.25,
+                        100
+                    );
+
+                const remaining =
+                    Math.max(
+                        maximum - sar,
+                        0
+                    );
+
+
+                gaugeChart =
+                    new Chart(
+                        document.getElementById(
+                            'gaugeChart'
+                        ),
+                        {
+                            type: 'doughnut',
+
+                            data: {
+
+                                datasets: [
+
+                                    {
+
+                                        data: [
+                                            sar,
+                                            remaining
+                                        ],
+
+                                        backgroundColor: [
+                                            primaryColor,
+                                            lightColor
+                                        ],
+
+                                        borderWidth: 0
+
+                                    }
+
+                                ]
+
+                            },
+
+                            options: {
+
+                                responsive: true,
+
+                                maintainAspectRatio:
+                                    false,
+
+                                rotation: -90,
+
+                                circumference: 180,
+
+                                cutout: '75%',
+
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+
+                                    tooltip: {
+                                        enabled: false
+                                    }
+                                }
+
+                            }
+
+                        }
+                    );
+
+
+                // =================================================
+                // CATEGORY
+                // =================================================
+
+                if (
+                    data.categoryLabels &&
+                    data.categoryLabels.length > 0
+                ) {
+
+                    categoryChart =
+                        new Chart(
+                            document.getElementById(
+                                'categoryChart'
+                            ),
+                            {
+                                type: 'bar',
+
+                                data: {
+
+                                    labels:
+                                        data.categoryLabels,
+
+                                    datasets: [
+
+                                        {
+                                            label: 'SAR',
+
+                                            data:
+                                                data.categoryDataSar,
+
+                                            backgroundColor:
+                                                primaryColor,
+
+                                            borderRadius: 4
+                                        }
+
+                                    ]
+
+                                },
+
+                                options: {
+
+                                    indexAxis: 'y',
+
+                                    responsive: true,
+
+                                    maintainAspectRatio:
+                                        false,
+
+                                    plugins: {
+
+                                        legend: {
+                                            display: false
+                                        }
+
+                                    },
+
+                                    scales: {
+
+                                        x: {
+                                            beginAtZero: true
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+                        );
+
+                }
+                else {
+
+                    document.getElementById(
+                        'categoryNoData'
+                    ).style.display = 'block';
+
+                }
+
+
+                // =================================================
+                // PAYMENT
+                // =================================================
+
+                if (
+                    data.paymentLabels &&
+                    data.paymentLabels.length > 0
+                ) {
+
+                    paymentChart =
+                        new Chart(
+                            document.getElementById(
+                                'paymentChart'
+                            ),
+                            {
+                                type: 'bar',
+
+                                data: {
+
+                                    labels:
+                                        data.paymentLabels,
+
+                                    datasets: [
+
+                                        {
+                                            label: 'SAR',
+
+                                            data:
+                                                data.paymentDataSar,
+
+                                            backgroundColor:
+                                                primaryColor,
+
+                                            borderRadius: 4
+                                        }
+
+                                    ]
+
+                                },
+
+                                options: {
+
+                                    indexAxis: 'y',
+
+                                    responsive: true,
+
+                                    maintainAspectRatio:
+                                        false,
+
+                                    plugins: {
+
+                                        legend: {
+                                            display: false
+                                        }
+
+                                    },
+
+                                    scales: {
+
+                                        x: {
+                                            beginAtZero: true
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+                        );
+
+                }
+                else {
+
+                    document.getElementById(
+                        'paymentNoData'
+                    ).style.display = 'block';
+
+                }
+
+            }
+            catch (error) {
+
+                console.error(
+                    'Analytics error:',
+                    error
+                );
+
+                showError(
+                    'Unable to load analytics for ' +
+                    selectedMonth
+                );
+
+            }
+
+        }
+
+
+        document
+            .getElementById(
+                'monthSelector'
+            )
+            .addEventListener(
+                'change',
+                function () {
+
+                    loadAnalytics(
+                        this.value
+                    );
+
+                }
+            );
+
+
+        loadMonths();
+
+    </script>
+
+</body>
+
+</html>

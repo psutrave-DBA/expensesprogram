@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1">
+
+    <title>Expense Tracker - Add Expense</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family:
+                'Segoe UI',
+                Arial,
+                sans-serif;
+
+            margin: 0;
+
+            padding: 25px;
+
+            background: #f4f6f9;
+
+            color: #333;
+        }
+
+        .nav-bar {
+            max-width: 500px;
+
+            margin: 0 auto 20px auto;
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            color: white;
+
+            padding: 8px 14px;
+
+            border: none;
+
+            border-radius: 5px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+            font-size: 13px;
+        }
+
+        .analytics-btn {
+            background: #528B8B;
+        }
+
+        .analytics-btn:hover {
+            background: #3f6b6b;
+        }
+
+        .financial-btn {
+            background: #6f42c1;
+        }
+
+        .financial-btn:hover {
+            background: #59339d;
+        }
+
+        .card {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 4px 10px
+                rgba(0,0,0,0.06);
+
+            max-width: 500px;
+
+            margin: auto;
+        }
+
+        h3 {
+            margin-top: 0;
+
+            color: #444;
+
+            border-bottom:
+                2px solid #f4f6f9;
+
+            padding-bottom: 10px;
+
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+
+            display: block;
+
+            margin-top: 15px;
+
+            font-size: 13px;
+
+            color: #555;
+        }
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            padding: 10px;
+
+            margin-top: 6px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 4px;
+
+            font-family: inherit;
+
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            outline: none;
+
+            border-color: #528B8B;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(82,139,139,.12);
+        }
+
+        button {
+
+            width: 100%;
+
+            background: #28a745;
+
+            color: white;
+
+            padding: 12px;
+
+            border: none;
+
+            border-radius: 4px;
+
+            margin-top: 22px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="nav-bar">
+
+        <a
+            href="/report"
+            class="nav-btn analytics-btn">
+
+            📊 Analytics Report
+
+        </a>
+
+        <a
+            href="/financial"
+            class="nav-btn financial-btn">
+
+            📋 Financial Analysis
+
+        </a>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            Add New Expense
+        </h3>
+
+
+        <form
+            action="/insert"
+            method="POST">
+
+
+            <label>
+                Expense Date:
+            </label>
+
+            <input
+                type="date"
+                name="ExpenseDate"
+                id="ExpenseDate"
+                required />
+
+
+            <label>
+                Category:
+            </label>
+
+            <select
+                name="Category"
+                required>
+
+                <option value="Cash">
+                    Cash
+                </option>
+
+                <option value="food">
+                    Food
+                </option>
+
+                <option value="Groceries">
+                    Groceries
+                </option>
+
+                <option value="Health">
+                    Health
+                </option>
+				
+				<option value="Loan">
+                    Loan
+                </option>
+
+                <option value="Other Expenses">
+                    Other Expenses
+                </option>
+
+                <option value="Telecom">
+                    Telecom
+                </option>
+
+                <option value="Transport">
+                    Transport
+                </option>
+
+            </select>
+
+
+            <label>
+                Description:
+            </label>
+
+            <textarea
+                name="Description"
+                rows="2"
+                placeholder="Optional notes..."></textarea>
+
+
+            <label>
+                Amount:
+            </label>
+
+            <input
+                type="number"
+                name="Amount"
+                step="0.01"
+                min="0.01"
+                required />
+
+
+            <label>
+                Currency:
+            </label>
+
+            <select
+                name="Currency"
+                required>
+
+                <option value="SAR">
+                    SAR
+                </option>
+
+                <option value="INR">
+                    INR
+                </option>
+
+            </select>
+
+
+            <label>
+                Payment Method:
+            </label>
+
+            <select
+                name="PaymentMethod"
+                required>
+
+                <option value="STC Pay">
+                    STC Pay
+                </option>
+
+                <option value="Cash">
+                    Cash
+                </option>
+
+                <option value="Alrajhi CC">
+                    Alrajhi CC
+                </option>
+
+                <option value="Alrajhi Bank">
+                    Alrajhi Bank
+                </option>
+
+                <option value="SAB CC">
+                    SAB CC
+                </option>
+				
+				<option value="Wallets">
+                    Wallets
+                </option>
+
+            </select>
+
+
+            <button type="submit">
+                Save Expense Row
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <script>
+
+        // Set today's date automatically.
+
+        const dateInput =
+            document.getElementById(
+                'ExpenseDate'
+            );
+
+        const today =
+            new Date();
+
+        const year =
+            today.getFullYear();
+
+        const month =
+            String(
+                today.getMonth() + 1
+            ).padStart(2, '0');
+
+        const day =
+            String(
+                today.getDate()
+            ).padStart(2, '0');
+
+        dateInput.value =
+            `${year}-${month}-${day}`;
+
+    </script>
+
+</body>
+
+</html>
