@@ -399,6 +399,11 @@
     </div>
 
 
+    <div class="filter-card selected-period">
+        <span id="exchangeRateNote"></span>
+        <a href="https://upstox.com/currency-converter/sar-to-inr/" target="_blank" rel="noopener noreferrer">Rate source: Upstox</a>
+    </div>
+
     <div
         id="errorMessage"
         class="error-message">
@@ -461,7 +466,7 @@
                 </div>
 
                 <div class="gauge-subtitle">
-                    Selected month
+                    Combined SAR + converted INR
                 </div>
 
             </div>
@@ -548,6 +553,30 @@
 
 
     <script>
+
+        // Fixed mid-market snapshot; update rate and date together when refreshing.
+        const exchangeRate = { inrPerSar: 25.656021, date: '2026-10-04' };
+        document.getElementById('exchangeRateNote').textContent =
+            'All graphs in SAR. 1 SAR = ' + exchangeRate.inrPerSar +
+            ' INR. Rate date: ' + exchangeRate.date +
+            '. Fixed rate applied to all months; not automatically refreshed.';
+
+        function inrToSar(amount) {
+            return Number(amount || 0) / exchangeRate.inrPerSar;
+        }
+
+        function normalizedBreakdown(labels, sarValues, inrValues) {
+            const rows = (labels || []).map((label, index) => ({
+                label,
+                sar: Number((sarValues || [])[index] || 0),
+                converted: inrToSar((inrValues || [])[index])
+            })).sort((a, b) => (b.sar + b.converted) - (a.sar + a.converted));
+            return {
+                labels: rows.map(row => row.label),
+                sar: rows.map(row => row.sar),
+                converted: rows.map(row => row.converted)
+            };
+        }
 
         const primaryColor = '#528B8B';
         const secondaryColor = '#86B7B7';
@@ -745,6 +774,12 @@
                 }
 
 
+                const category = normalizedBreakdown(data.categoryLabels, data.categoryDataSar, data.categoryDataInr);
+                const payment = normalizedBreakdown(data.paymentLabels, data.paymentDataSar, data.paymentDataInr);
+                for (const id of ['trendNoData', 'categoryNoData', 'paymentNoData']) {
+                    document.getElementById(id).style.display = 'none';
+                }
+
                 const monthLabel =
                     data.selectedMonthLabel;
 
@@ -809,10 +844,12 @@
                     formatNumber(inr);
 
 
+                const combinedSar = sar + inrToSar(inr);
+
                 document.getElementById(
                     'gaugeText'
                 ).textContent =
-                    formatNumber(sar) +
+                    formatNumber(combinedSar) +
                     ' SAR';
 
 
@@ -840,7 +877,7 @@
                                     datasets: [
 
                                         {
-                                            label: 'SAR',
+                                            label: 'SAR expenses',
 
                                             data:
                                                 data.monthlyDataSar,
@@ -852,10 +889,10 @@
                                         },
 
                                         {
-                                            label: 'INR',
+                                            label: 'INR expenses (in SAR)',
 
                                             data:
-                                                data.monthlyDataInr,
+                                                (data.monthlyDataInr || []).map(inrToSar),
 
                                             backgroundColor:
                                                 secondaryColor,
@@ -878,6 +915,12 @@
 
                                         legend: {
                                             display: true
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: context => context.dataset.label + ': ' +
+                                                    formatNumber(context.parsed[context.chart.options.indexAxis === 'y' ? 'x' : 'y']) + ' SAR'
+                                            }
                                         }
 
                                     },
@@ -885,7 +928,8 @@
                                     scales: {
 
                                         y: {
-                                            beginAtZero: true
+                                            beginAtZero: true,
+                                            title: { display: true, text: 'Amount (SAR)' }
                                         }
 
                                     }
@@ -911,13 +955,13 @@
 
                 const maximum =
                     Math.max(
-                        sar * 1.25,
+                        combinedSar * 1.25,
                         100
                     );
 
                 const remaining =
                     Math.max(
-                        maximum - sar,
+                        maximum - combinedSar,
                         0
                     );
 
@@ -937,7 +981,7 @@
                                     {
 
                                         data: [
-                                            sar,
+                                            combinedSar,
                                             remaining
                                         ],
 
@@ -1003,15 +1047,15 @@
                                 data: {
 
                                     labels:
-                                        data.categoryLabels,
+                                        category.labels,
 
                                     datasets: [
 
                                         {
-                                            label: 'SAR',
+                                            label: 'SAR expenses',
 
                                             data:
-                                                data.categoryDataSar,
+                                                category.sar,
 
                                             backgroundColor:
                                                 primaryColor,
@@ -1019,8 +1063,8 @@
                                             borderRadius: 4
                                         },
                                         {
-                                            label: 'INR',
-                                            data: data.categoryDataInr,
+                                            label: 'INR expenses (in SAR)',
+                                            data: category.converted,
                                             backgroundColor: secondaryColor,
                                             borderRadius: 4
                                         }
@@ -1042,6 +1086,12 @@
 
                                         legend: {
                                             display: true
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: context => context.dataset.label + ': ' +
+                                                    formatNumber(context.parsed[context.chart.options.indexAxis === 'y' ? 'x' : 'y']) + ' SAR'
+                                            }
                                         }
 
                                     },
@@ -1049,7 +1099,8 @@
                                     scales: {
 
                                         x: {
-                                            beginAtZero: true
+                                            beginAtZero: true,
+                                            title: { display: true, text: 'Amount (SAR)' }
                                         }
 
                                     }
@@ -1089,15 +1140,15 @@
                                 data: {
 
                                     labels:
-                                        data.paymentLabels,
+                                        payment.labels,
 
                                     datasets: [
 
                                         {
-                                            label: 'SAR',
+                                            label: 'SAR expenses',
 
                                             data:
-                                                data.paymentDataSar,
+                                                payment.sar,
 
                                             backgroundColor:
                                                 primaryColor,
@@ -1105,8 +1156,8 @@
                                             borderRadius: 4
                                         },
                                         {
-                                            label: 'INR',
-                                            data: data.paymentDataInr,
+                                            label: 'INR expenses (in SAR)',
+                                            data: payment.converted,
                                             backgroundColor: secondaryColor,
                                             borderRadius: 4
                                         }
@@ -1128,6 +1179,12 @@
 
                                         legend: {
                                             display: true
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: context => context.dataset.label + ': ' +
+                                                    formatNumber(context.parsed[context.chart.options.indexAxis === 'y' ? 'x' : 'y']) + ' SAR'
+                                            }
                                         }
 
                                     },
@@ -1135,7 +1192,8 @@
                                     scales: {
 
                                         x: {
-                                            beginAtZero: true
+                                            beginAtZero: true,
+                                            title: { display: true, text: 'Amount (SAR)' }
                                         }
 
                                     }
