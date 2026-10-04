@@ -270,7 +270,7 @@
         }
 
 
-        .summary-value.usd {
+        .summary-value.inr {
 
             color: #6f42c1;
         }
@@ -410,7 +410,7 @@
         }
 
 
-        .usd {
+        .inr {
             color: #6f42c1;
         }
 
@@ -768,8 +768,8 @@
             </div>
 
             <div
-                id="totalUsd"
-                class="summary-value usd">
+                id="totalInr"
+                class="summary-value inr">
 
                 0.00
 
@@ -873,7 +873,7 @@
 
             <span>
                 INR:
-                <strong id="footerUsd">
+                <strong id="footerInr">
                     0.00
                 </strong>
             </span>
@@ -1146,10 +1146,10 @@
 
 
                 document.getElementById(
-                    'totalINR'
+                    'totalInr'
                 ).textContent =
                     formatNumber(
-                        data.totalUsd
+                        data.totalInr
                     );
 
 
@@ -1162,10 +1162,10 @@
 
 
                 document.getElementById(
-                    'footerUsd'
+                    'footerInr'
                 ).textContent =
                     formatNumber(
-                        data.totalUsd
+                        data.totalInr
                     );
 
 
@@ -1312,7 +1312,7 @@
                                 (
                                     record.currency ===
                                     'INR'
-                                        ? 'INR'
+                                        ? 'inr'
                                         : 'sar'
                                 );
 

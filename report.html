@@ -479,8 +479,8 @@
 
                 <div class="currency-box">
 
-                    USD:
-                    <strong id="usdTotal">
+                    INR:
+                    <strong id="inrTotal">
                         0.00
                     </strong>
 
@@ -790,9 +790,9 @@
                         0
                     );
 
-                const usd =
+                const inr =
                     Number(
-                        data.selectedMonthTotalUsd ||
+                        data.selectedMonthTotalInr ||
                         0
                     );
 
@@ -804,9 +804,9 @@
 
 
                 document.getElementById(
-                    'usdTotal'
+                    'inrTotal'
                 ).textContent =
-                    formatNumber(usd);
+                    formatNumber(inr);
 
 
                 document.getElementById(
@@ -852,10 +852,10 @@
                                         },
 
                                         {
-                                            label: 'USD',
+                                            label: 'INR',
 
                                             data:
-                                                data.monthlyDataUsd,
+                                                data.monthlyDataInr,
 
                                             backgroundColor:
                                                 secondaryColor,
@@ -1017,6 +1017,12 @@
                                                 primaryColor,
 
                                             borderRadius: 4
+                                        },
+                                        {
+                                            label: 'INR',
+                                            data: data.categoryDataInr,
+                                            backgroundColor: secondaryColor,
+                                            borderRadius: 4
                                         }
 
                                     ]
@@ -1035,7 +1041,7 @@
                                     plugins: {
 
                                         legend: {
-                                            display: false
+                                            display: true
                                         }
 
                                     },
@@ -1097,6 +1103,12 @@
                                                 primaryColor,
 
                                             borderRadius: 4
+                                        },
+                                        {
+                                            label: 'INR',
+                                            data: data.paymentDataInr,
+                                            backgroundColor: secondaryColor,
+                                            borderRadius: 4
                                         }
 
                                     ]
@@ -1115,7 +1127,7 @@
                                     plugins: {
 
                                         legend: {
-                                            display: false
+                                            display: true
                                         }
 
                                     },

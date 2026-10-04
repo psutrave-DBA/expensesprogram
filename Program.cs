@@ -210,19 +210,19 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
 
 
         decimal selectedMonthTotalSar = 0;
-        decimal selectedMonthTotalUsd = 0;
+        decimal selectedMonthTotalInr = 0;
 
         var monthlyLabels = new List<string>();
         var monthlyDataSar = new List<decimal>();
-        var monthlyDataUsd = new List<decimal>();
+        var monthlyDataInr = new List<decimal>();
 
         var categoryLabels = new List<string>();
         var categoryDataSar = new List<decimal>();
-        var categoryDataUsd = new List<decimal>();
+        var categoryDataInr = new List<decimal>();
 
         var paymentLabels = new List<string>();
         var paymentDataSar = new List<decimal>();
-        var paymentDataUsd = new List<decimal>();
+        var paymentDataInr = new List<decimal>();
 
 
         await using var conn = CreateConnection();
@@ -268,12 +268,12 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                         reader["TotalAmount"]);
 
                 if (currency.Equals(
-                        "USD",
+                        "INR",
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    selectedMonthTotalUsd += amount;
+                    selectedMonthTotalInr += amount;
                 }
-                else
+                else if (currency.Equals("SAR", StringComparison.OrdinalIgnoreCase))
                 {
                     selectedMonthTotalSar += amount;
                 }
@@ -360,7 +360,7 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                 ISNULL(
                     u.TotalAmount,
                     0
-                ) AS UsdAmount
+                ) AS InrAmount
 
             FROM Months m
 
@@ -370,7 +370,7 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
 
             LEFT JOIN ExpenseTotals u
                 ON u.MonthStart = m.MonthStart
-               AND u.Currency = 'USD'
+               AND u.Currency = 'INR'
 
             ORDER BY m.MonthStart
 
@@ -398,15 +398,15 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                     Convert.ToDecimal(
                         reader["SarAmount"]);
 
-                decimal usd =
+                decimal inr =
                     Convert.ToDecimal(
-                        reader["UsdAmount"]);
+                        reader["InrAmount"]);
 
                 monthlyLabels.Add(
                     monthStart.ToString("MMM yyyy"));
 
                 monthlyDataSar.Add(sar);
-                monthlyDataUsd.Add(usd);
+                monthlyDataInr.Add(inr);
             }
         }
 
@@ -462,7 +462,7 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
             new Dictionary<string, decimal>(
                 StringComparer.OrdinalIgnoreCase);
 
-        var categoryUsd =
+        var categoryInr =
             new Dictionary<string, decimal>(
                 StringComparer.OrdinalIgnoreCase);
 
@@ -494,14 +494,14 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                         reader["TotalAmount"]);
 
                 if (currency.Equals(
-                        "USD",
+                        "INR",
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    categoryUsd[category] =
-                        categoryUsd.GetValueOrDefault(
+                    categoryInr[category] =
+                        categoryInr.GetValueOrDefault(
                             category) + amount;
                 }
-                else
+                else if (currency.Equals("SAR", StringComparison.OrdinalIgnoreCase))
                 {
                     categorySar[category] =
                         categorySar.GetValueOrDefault(
@@ -514,14 +514,14 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
         var allCategories =
             categorySar.Keys
                 .Union(
-                    categoryUsd.Keys,
+                    categoryInr.Keys,
                     StringComparer.OrdinalIgnoreCase)
                 .OrderByDescending(
                     category =>
                         categorySar.GetValueOrDefault(
                             category)
                         +
-                        categoryUsd.GetValueOrDefault(
+                        categoryInr.GetValueOrDefault(
                             category))
                 .ToList();
 
@@ -534,8 +534,8 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                 categorySar.GetValueOrDefault(
                     category));
 
-            categoryDataUsd.Add(
-                categoryUsd.GetValueOrDefault(
+            categoryDataInr.Add(
+                categoryInr.GetValueOrDefault(
                     category));
         }
 
@@ -591,7 +591,7 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
             new Dictionary<string, decimal>(
                 StringComparer.OrdinalIgnoreCase);
 
-        var paymentUsd =
+        var paymentInr =
             new Dictionary<string, decimal>(
                 StringComparer.OrdinalIgnoreCase);
 
@@ -623,14 +623,14 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                         reader["TotalAmount"]);
 
                 if (currency.Equals(
-                        "USD",
+                        "INR",
                         StringComparison.OrdinalIgnoreCase))
                 {
-                    paymentUsd[paymentMethod] =
-                        paymentUsd.GetValueOrDefault(
+                    paymentInr[paymentMethod] =
+                        paymentInr.GetValueOrDefault(
                             paymentMethod) + amount;
                 }
-                else
+                else if (currency.Equals("SAR", StringComparison.OrdinalIgnoreCase))
                 {
                     paymentSar[paymentMethod] =
                         paymentSar.GetValueOrDefault(
@@ -643,14 +643,14 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
         var allPaymentMethods =
             paymentSar.Keys
                 .Union(
-                    paymentUsd.Keys,
+                    paymentInr.Keys,
                     StringComparer.OrdinalIgnoreCase)
                 .OrderByDescending(
                     method =>
                         paymentSar.GetValueOrDefault(
                             method)
                         +
-                        paymentUsd.GetValueOrDefault(
+                        paymentInr.GetValueOrDefault(
                             method))
                 .ToList();
 
@@ -663,8 +663,8 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                 paymentSar.GetValueOrDefault(
                     method));
 
-            paymentDataUsd.Add(
-                paymentUsd.GetValueOrDefault(
+            paymentDataInr.Add(
+                paymentInr.GetValueOrDefault(
                     method));
         }
 
@@ -680,19 +680,19 @@ app.MapGet("/api/analytics", async (HttpRequest request) =>
                 selectedMonth.ToString("MMMM yyyy"),
 
             selectedMonthTotalSar,
-            selectedMonthTotalUsd,
+            selectedMonthTotalInr,
 
             monthlyLabels,
             monthlyDataSar,
-            monthlyDataUsd,
+            monthlyDataInr,
 
             categoryLabels,
             categoryDataSar,
-            categoryDataUsd,
+            categoryDataInr,
 
             paymentLabels,
             paymentDataSar,
-            paymentDataUsd,
+            paymentDataInr,
 
             generatedAt =
                 DateTime.Now
@@ -839,7 +839,7 @@ app.MapGet("/api/financial", async (HttpRequest request) =>
         var records = new List<object>();
 
         decimal totalSar = 0;
-        decimal totalUsd = 0;
+        decimal totalInr = 0;
 
         int recordCount = 0;
 
@@ -957,12 +957,12 @@ app.MapGet("/api/financial", async (HttpRequest request) =>
 
 
             if (currency.Equals(
-                    "USD",
+                    "INR",
                     StringComparison.OrdinalIgnoreCase))
             {
-                totalUsd += amount;
+                totalInr += amount;
             }
-            else
+            else if (currency.Equals("SAR", StringComparison.OrdinalIgnoreCase))
             {
                 totalSar += amount;
             }
@@ -1012,7 +1012,7 @@ app.MapGet("/api/financial", async (HttpRequest request) =>
             recordCount,
 
             totalSar,
-            totalUsd,
+            totalInr,
 
             records
         });
@@ -1185,7 +1185,7 @@ app.MapGet(
 
 
         decimal totalSar = 0;
-        decimal totalUsd = 0;
+        decimal totalInr = 0;
 
 
         while (await reader.ReadAsync())
@@ -1216,12 +1216,12 @@ app.MapGet(
 
 
             if (currency.Equals(
-                    "USD",
+                    "INR",
                     StringComparison.OrdinalIgnoreCase))
             {
-                totalUsd += amount;
+                totalInr += amount;
             }
-            else
+            else if (currency.Equals("SAR", StringComparison.OrdinalIgnoreCase))
             {
                 totalSar += amount;
             }
@@ -1276,8 +1276,8 @@ app.MapGet(
                 CultureInfo.InvariantCulture));
 
         csv.AppendLine(
-            "TOTAL USD,,,,," +
-            totalUsd.ToString(
+            "TOTAL INR,,,,," +
+            totalInr.ToString(
                 "0.00",
                 CultureInfo.InvariantCulture));
 
@@ -1409,7 +1409,7 @@ app.MapPost("/insert", async (HttpRequest request) =>
 
         if (
             currency != "SAR" &&
-            currency != "USD")
+            currency != "INR")
         {
             return Results.BadRequest(
                 "Invalid currency.");
