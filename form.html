@@ -301,6 +301,7 @@
 
             <select
                 name="Currency"
+                id="Currency"
                 required>
 
                 <option value="SAR">
@@ -320,6 +321,7 @@
 
             <select
                 name="PaymentMethod"
+                id="PaymentMethod"
                 required>
 
                 <option value="STC Pay">
@@ -359,6 +361,34 @@
 
 
     <script>
+
+        const currencyInput = document.getElementById('Currency');
+        const paymentMethodInput = document.getElementById('PaymentMethod');
+        const sarPaymentMethods = Array.from(
+            paymentMethodInput.options,
+            option => option.value
+        );
+        const inrPaymentMethods = [
+            'SBI', 'HDFC', 'ICICI CC', 'AXIS CC', 'SAM HDFC CC'
+        ];
+
+        function updatePaymentMethods() {
+            const methods = currencyInput.value === 'INR'
+                ? inrPaymentMethods
+                : sarPaymentMethods;
+            const previousMethod = paymentMethodInput.value;
+
+            paymentMethodInput.replaceChildren(
+                ...methods.map(method => new Option(method, method))
+            );
+            paymentMethodInput.value = methods.includes(previousMethod)
+                ? previousMethod
+                : methods[0];
+        }
+
+        currencyInput.addEventListener('change', updatePaymentMethods);
+        window.addEventListener('pageshow', updatePaymentMethods);
+        updatePaymentMethods();
 
         // Set today's date automatically.
 
